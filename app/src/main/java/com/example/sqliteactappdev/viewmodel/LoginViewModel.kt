@@ -13,7 +13,8 @@ data class LoginUiState(
     val password: String = "",
     val passwordVisible: Boolean = false,
     val errorMessage: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val loggedInUser: com.example.sqliteactappdev.model.User? = null
 )
 
 class LoginViewModel(
@@ -63,6 +64,7 @@ class LoginViewModel(
             _uiState.value = _uiState.value.copy(isLoading = false)
             
             if (user != null) {
+                _uiState.value = _uiState.value.copy(loggedInUser = user)
                 onSuccess()
             } else {
                 _uiState.value = _uiState.value.copy(errorMessage = "Invalid username or password")

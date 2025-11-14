@@ -14,6 +14,7 @@ data class RegisterUiState(
     val username: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val role: String = "guest",
     val passwordVisible: Boolean = false,
     val confirmPasswordVisible: Boolean = false,
     val errorMessage: String = "",
@@ -48,6 +49,13 @@ class RegisterViewModel(
         )
     }
 
+    fun updateRole(role: String) {
+        _uiState.value = _uiState.value.copy(
+            role = role,
+            errorMessage = ""
+        )
+    }
+
     fun togglePasswordVisibility() {
         _uiState.value = _uiState.value.copy(passwordVisible = !_uiState.value.passwordVisible)
     }
@@ -56,7 +64,7 @@ class RegisterViewModel(
         _uiState.value = _uiState.value.copy(confirmPasswordVisible = !_uiState.value.confirmPasswordVisible)
     }
 
-    fun register(onSuccess: () -> Unit) {
+    fun register(onSuccess: (com.example.sqliteactappdev.model.User) -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = "")
 
@@ -94,12 +102,22 @@ class RegisterViewModel(
             }
 
             // Insert user
-            val result = userRepository.insertUser(_uiState.value.username, _uiState.value.password)
+            val result = userRepository.insertUser(_uiState.value.username, _uiState.value.password, _uiState.value.role)
             
             _uiState.value = _uiState.value.copy(isLoading = false)
             
             result.fold(
-                onSuccess = { onSuccess() },
+                onSuccess = { userId ->
+                    // Fetch the created user to get the full user object
+                    val createdUser = userRepository.getUserByUsername(_uiState.value.username)
+                    if (createdUser != null) {
+                        onSuccess(createdUser)
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            errorMessage = "Registration successful but failed to retrieve user data."
+                        )
+                    }
+                },
                 onFailure = {
                     _uiState.value = _uiState.value.copy(
                         errorMessage = "Registration failed. Please try again."

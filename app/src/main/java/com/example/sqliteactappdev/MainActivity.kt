@@ -30,10 +30,10 @@ class MainActivity : ComponentActivity() {
                 AppNavigation(
                     navController = navController,
                     userRepository = userRepository
-                )
+                    )
+                }
             }
         }
-    }
 }
 
 @Preview(showBackground = true)

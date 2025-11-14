@@ -15,7 +15,7 @@ import com.example.sqliteactappdev.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (com.example.sqliteactappdev.model.User) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -62,7 +62,11 @@ fun LoginScreen(
 
         PrimaryButton(
             text = "Login",
-            onClick = { viewModel.login(onLoginSuccess) },
+            onClick = { 
+                viewModel.login {
+                    uiState.loggedInUser?.let { onLoginSuccess(it) }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
@@ -76,10 +80,14 @@ fun LoginScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don't have an account? ",
+                text = "Don't have an account?",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
-            TextButton(onClick = onNavigateToRegister) {
+            Spacer(modifier = Modifier.width(4.dp))
+            TextButton(
+                onClick = onNavigateToRegister,
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+            ) {
                 Text(
                     text = "Register",
                     color = com.example.sqliteactappdev.ui.theme.OrangePrimary,

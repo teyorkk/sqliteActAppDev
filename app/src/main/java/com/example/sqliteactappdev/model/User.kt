@@ -3,6 +3,7 @@ package com.example.sqliteactappdev.model
 data class User(
     val id: Int,
     val username: String,
-    val password: String
+    val password: String,
+    val role: String
 )
 
